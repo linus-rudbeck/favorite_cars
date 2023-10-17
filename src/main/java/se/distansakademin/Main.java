@@ -15,7 +15,6 @@ public class Main {
     public static void main(String[] args) {
         db = new Database(); // Connect to the db and save connection
 
-
         while (true) {
             var selection = mainMenu();
             handleMenuSelection(selection);
@@ -58,9 +57,43 @@ public class Main {
             case 1:
                 showCars();
                 break;
+            case 2:
+                addNewCar();
+                System.exit(0);
+                break;
             default: // If not valid input, print error
                 System.out.println("Invalid selection");
                 break;
+        }
+    }
+
+    // Create a new car and save to db
+    private static void addNewCar() {
+        Scanner scanner = new Scanner(System.in); // Scanner is used to retrieve user input
+
+        // Tell our user to enter a make
+        System.out.print("Enter make: ");
+        String make = scanner.next(); // Retrieve user input
+
+        // Tell our user to enter a model
+        System.out.print("Enter model: ");
+        String model = scanner.next(); // Retrieve user input
+
+        // Tell our user to enter a year
+        System.out.print("Enter year: ");
+        int year = scanner.nextInt();
+
+        // Create new car from user inputs
+        Car car = new Car(make, model, year);
+
+        // Save car to db and save result (true/false) to variable
+        boolean result = db.saveCar(car);
+
+        if(result){ // If result is true: Save successful
+            System.out.println("Car saved");
+        }
+        else { // If not: Print error
+            System.out.println("Error saving car");
         }
     }
 

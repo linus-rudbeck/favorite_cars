@@ -28,21 +28,28 @@ public class Database {
         }
     }
 
+    // Saves a car to the database
     public boolean saveCar(Car car){
+
+        // SQL query to save a car to the database
         String sql = "INSERT INTO cars (make, model, year) VALUES (?, ?, ?)";
 
-        boolean result;
+        boolean result; // Save true/false if insert works
 
         try {
+            // Use prepared statements to make sure we are not vulnerable
             PreparedStatement stmt = conn.prepareStatement(sql);
 
+            // Set parameters in out statement
             stmt.setString(1, car.getMake());
             stmt.setString(2, car.getModel());
             stmt.setInt(3, car.getYear());
 
+            // Execute query, executeUpdate() returns number of rows updates
+            // If executeUpdate() > 0 means out query worked
             result = stmt.executeUpdate() > 0;
 
-            stmt.close();
+            stmt.close(); // Close statement but not db connection
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

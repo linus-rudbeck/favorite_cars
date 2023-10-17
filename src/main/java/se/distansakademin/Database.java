@@ -1,6 +1,8 @@
 package se.distansakademin;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Database {
 
@@ -46,5 +48,38 @@ public class Database {
         }
 
         return result;
+    }
+
+    // Get all cars from our database
+    public ArrayList<Car> getCars(){
+        String sql = "SELECT * FROM cars"; // SQL query for getting all cars
+
+        ArrayList<Car> cars = null; // Create list outside try-catch so we can return it later
+
+        try {
+            // Prepare and execute our database query
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            cars = new ArrayList<>(); // Set cars to an empty list
+
+            while(rs.next()){ // For every row (car)
+
+                // Get all properties
+                int id = rs.getInt("id");
+                String make = rs.getString("make");
+                String model = rs.getString("model");
+                int year = rs.getInt("year");
+
+                Car car = new Car(id, make, model, year); // Create new car object
+
+                cars.add(car); // Add our car object in the list
+            }
+
+        } catch (SQLException e) {
+            // Log or handle error...
+        }
+
+        return cars; // Returns all cars (if it worked) or null (if not)
     }
 }

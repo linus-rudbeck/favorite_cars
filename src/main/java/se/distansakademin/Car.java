@@ -56,12 +56,7 @@ public class Car {
     }
 
     @Override
-    public String toString() {
-        return "Car{" +
-                "id=" + id +
-                ", make='" + make + '\'' +
-                ", model='" + model + '\'' +
-                ", year=" + year +
-                '}';
+    public String toString() { // Format string output
+        return id + ": " + make + " " + model + " (" + year + ")";
     }
 }

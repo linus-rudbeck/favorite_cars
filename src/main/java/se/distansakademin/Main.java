@@ -1,6 +1,7 @@
 package se.distansakademin;
 
 // Comment to show git push
+// Another comment
 
 public class Main {
     public static void main(String[] args) {

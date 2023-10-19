@@ -31,7 +31,7 @@ public class Main {
                 // Prints main menu
                 System.out.print("\n### Main Menu ###\n" +
                         "1. Show cars\n" + // Read
-                        "2. Add car (not implemented)\n" + // Create
+                        "2. Add car\n" + // Create
                         "3. Update car (not implemented)\n" + // Update
                         "4. Delete car (not implemented)\n" + // Delete
                         "Enter selection: ");
@@ -59,12 +59,44 @@ public class Main {
                 break;
             case 2:
                 addNewCar();
-                System.exit(0);
+                break;
+            case 3:
+                updateCar();
                 break;
             default: // If not valid input, print error
                 System.out.println("Invalid selection");
                 break;
         }
+    }
+
+    // Update an existing car in the database
+    public static void updateCar(){
+        // 1. Ta emot uppgifter
+        Scanner scanner = new Scanner(System.in);
+
+        // Make our user select an ID to update
+        System.out.print("Enter id to update: ");
+        int id = scanner.nextInt();
+
+        // Tell our user to enter a make
+        System.out.print("Enter make: ");
+        String make = scanner.next(); // Retrieve user input
+
+        // Tell our user to enter a model
+        System.out.print("Enter model: ");
+        String model = scanner.next(); // Retrieve user input
+
+        // Tell our user to enter a year
+        System.out.print("Enter year: ");
+        int year = scanner.nextInt();
+
+        // 2. Skapa nytt bil-objekt
+        Car car = new Car(id, make, model, year);
+
+        // 3. Skicka bilen till databasen
+        db.updateCar(car);
+
+        // 4. Skriv ut om det funka!
     }
 
     // Create a new car and save to db

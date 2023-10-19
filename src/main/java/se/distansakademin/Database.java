@@ -18,7 +18,7 @@ public class Database {
                     "id INTEGER PRIMARY KEY," +
                     "make TEXT NOT NULL," +
                     "model TEXT NOT NULL," +
-                    "year INTEGER NOT NULL)";
+                    "year INTEGER NOT NULL);";
 
             stmt.execute(sql);
 
@@ -88,5 +88,14 @@ public class Database {
         }
 
         return cars; // Returns all cars (if it worked) or null (if not)
+    }
+
+    public boolean updateCar(Car car){
+
+        String sql = "UPDATE cars SET make = ?, model = ?, year = ? WHERE id = ?";
+
+        ///
+
+        return false;
     }
 }

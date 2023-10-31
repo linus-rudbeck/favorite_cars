@@ -2,96 +2,85 @@ package se.distansakademin;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Database {
+    public static final String DB_URL = "jdbc:sqlite:sample.db";
 
-    private Connection conn;
+    private Connection connection;
 
-    public Database(){
-        try {
-            conn = DriverManager.getConnection("jdbc:sqlite:sample.db");
+    public Database() throws SQLException {
+        connection = DriverManager.getConnection(DB_URL);
 
-            Statement stmt = conn.createStatement();
+        createCarsTableIfNotExists();
+    }
 
-            String sql = "CREATE TABLE IF NOT EXISTS cars (" +
-                    "id INTEGER PRIMARY KEY," +
-                    "make TEXT NOT NULL," +
-                    "model TEXT NOT NULL," +
-                    "year INTEGER NOT NULL);";
+    private void createCarsTableIfNotExists() throws SQLException {
+        Statement stmt = connection.createStatement();
 
-            stmt.execute(sql);
+        String sql = "CREATE TABLE IF NOT EXISTS cars (" +
+                "id INTEGER PRIMARY KEY," +
+                "make TEXT NOT NULL," +
+                "model TEXT NOT NULL," +
+                "year INTEGER NOT NULL);";
 
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        stmt.execute(sql);
     }
 
     // Saves a car to the database
-    public boolean saveCar(Car car){
+    public boolean saveCar(Car car) throws SQLException {
+        PreparedStatement stmt = prepareInsertCarStatement(car);
+        return stmt.executeUpdate() > 0;
+    }
 
-        // SQL query to save a car to the database
+    private PreparedStatement prepareInsertCarStatement(Car car) throws SQLException {
         String sql = "INSERT INTO cars (make, model, year) VALUES (?, ?, ?)";
 
-        boolean result; // Save true/false if insert works
+        PreparedStatement stmt = connection.prepareStatement(sql);
 
-        try {
-            // Use prepared statements to make sure we are not vulnerable
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, car.getMake());
+        stmt.setString(2, car.getModel());
+        stmt.setInt(3, car.getYear());
 
-            // Set parameters in out statement
-            stmt.setString(1, car.getMake());
-            stmt.setString(2, car.getModel());
-            stmt.setInt(3, car.getYear());
-
-            // Execute query, executeUpdate() returns number of rows updates
-            // If executeUpdate() > 0 means out query worked
-            result = stmt.executeUpdate() > 0;
-
-            stmt.close(); // Close statement but not db connection
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return result;
+        return stmt;
     }
 
-    // Get all cars from our database
-    public ArrayList<Car> getCars(){
-        String sql = "SELECT * FROM cars"; // SQL query for getting all cars
-
-        ArrayList<Car> cars = null; // Create list outside try-catch so we can return it later
-
-        try {
-            // Prepare and execute our database query
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-
-            cars = new ArrayList<>(); // Set cars to an empty list
-
-            while(rs.next()){ // For every row (car)
-
-                // Get all properties
-                int id = rs.getInt("id");
-                String make = rs.getString("make");
-                String model = rs.getString("model");
-                int year = rs.getInt("year");
-
-                Car car = new Car(id, make, model, year); // Create new car object
-
-                cars.add(car); // Add our car object in the list
-            }
-
-        } catch (SQLException e) {
-            // Log or handle error...
-        }
-
-        return cars; // Returns all cars (if it worked) or null (if not)
+    /**
+     * Selects all cars from selected db (...)
+     *
+     * @return A list of all cars in the database
+     * @throws SQLException - if the database is inaccessible or has an incorrect structure
+     */
+    public ArrayList<Car> getAllCars() throws SQLException {
+        ResultSet rs = executeSelectSql("SELECT * FROM cars");
+        return getCarListFromResultSet(rs);
     }
 
-    public boolean updateCar(Car car){
+    private ResultSet executeSelectSql(String sql) throws SQLException {
+        // Mer tillåtet
+        return connection.createStatement().executeQuery(sql);
+    }
 
+    private static ArrayList<Car> getCarListFromResultSet(ResultSet rs) throws SQLException {
+        ArrayList<Car> cars = new ArrayList<>();
+
+        while (rs.next()) { // For every row (car)
+            // Mindre tillåtet
+            cars.add(getCarFromResultSet(rs)); // Add our car object in the list
+        }
+
+        return cars;
+    }
+
+    private static Car getCarFromResultSet(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String make = rs.getString("make");
+        String model = rs.getString("model");
+        int year = rs.getInt("year");
+
+        return new Car(id, make, model, year);
+    }
+
+    public boolean updateCar(Car car) {
         String sql = "UPDATE cars SET make = ?, model = ?, year = ? WHERE id = ?";
 
         ///

@@ -5,22 +5,46 @@ public class Car {
     private String make;
     private String model;
     private int year;
+    private int mileage = 20000;
+    private int gasLevel = 50;
 
-    // Use this constructor when we only have make, model and year
-    // such as when we create a new car
     public Car(String make, String model, int year) {
         this.make = make;
         this.model = model;
         this.year = year;
     }
 
-    // Use this constructor when we have all properties (including ID)
-    // such as when we get the car from the database
     public Car(int id, String make, String model, int year) {
         this.id = id;
         this.make = make;
         this.model = model;
         this.year = year;
+    }
+
+    public boolean needsService() { // car.needsService() <-- Rekommenderas
+        int SERVICE_AT_MILEAGE = 20000;
+        return mileage > SERVICE_AT_MILEAGE;
+    }
+
+
+    public static boolean needsService(int mileage) { // Car.needsService(car.getMileage()) <-- Rekommenderas ej
+        int SERVICE_AT_MILEAGE = 20000;
+        return mileage > SERVICE_AT_MILEAGE;
+    }
+
+
+    public String getGasWarning() {
+        if (gasLevel > 80) {
+            return "GOOD";
+        } else if (gasLevel > 60) {
+            return "OKAY";
+        } else if (gasLevel > 40) {
+            return "HALF WAY";
+        } else if (gasLevel > 20) {
+            return "RUNNING OUT";
+        } else {
+            return "WARNING";
+        }
     }
 
     public int getId() {
@@ -36,6 +60,7 @@ public class Car {
     }
 
     public void setMake(String make) {
+        make = make.toLowerCase();
         this.make = make;
     }
 
@@ -53,6 +78,22 @@ public class Car {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public int getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(int mileage) {
+        this.mileage = mileage;
+    }
+
+    public int getGasLevel() {
+        return gasLevel;
+    }
+
+    public void setGasLevel(int gasLevel) {
+        this.gasLevel = gasLevel;
     }
 
     @Override

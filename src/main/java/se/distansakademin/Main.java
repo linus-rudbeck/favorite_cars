@@ -1,18 +1,23 @@
 package se.distansakademin;
 
-// Comment to show git push
-// Another comment
-
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
-    // db object will be a connection to
-    // the database in all other static functions
     private static Database db;
 
     public static void main(String[] args) {
+        try {
+            runProgram();
+        } catch (SQLException exception) {
+            System.out.println("An error occurred with the database. Contact support immediately!");
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    private static void runProgram() throws SQLException {
         db = new Database(); // Connect to the db and save connection
 
         while (true) {
@@ -22,38 +27,43 @@ public class Main {
     }
 
     // Show main meu and return users selection
-    private static int mainMenu(){
+    private static int mainMenu() {
         // CRUD: Create, Read, Update, Delete
 
         while (true) { // Show menu until user selects a number
             try { // Try so we can catch invalid inputs (non integer values)
+                printMainMenu();
 
-                // Prints main menu
-                System.out.print("\n### Main Menu ###\n" +
-                        "1. Show cars\n" + // Read
-                        "2. Add car\n" + // Create
-                        "3. Update car (not implemented)\n" + // Update
-                        "4. Delete car (not implemented)\n" + // Delete
-                        "Enter selection: ");
-
-                // Get user input and convert to int
-                Scanner scanner = new Scanner(System.in);
-                String input = scanner.next();
-
-                // Throws error if invalid input
-                int inputSelection = Integer.parseInt(input);
-
-                return inputSelection; // Return selection if everything worked
-
+                return getMenuSelection();
             } catch (NumberFormatException e) { // If invalid input, print error
-                System.out.println("INVALID NUMBER");
+                System.out.println("Invalid menu selection, please try again");
             }
         }
     }
 
+    private static int getMenuSelection() throws NumberFormatException {
+        // Get user input and convert to int
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.next();
+
+        // Throws error if invalid input
+
+        return Integer.parseInt(input);
+    }
+
+    private static void printMainMenu() {
+        // Prints main menu
+        System.out.print("\n### Main Menu ###\n" +
+                "1. Show cars\n" + // Read
+                "2. Add car\n" + // Create
+                "3. Update car (not implemented)\n" + // Update
+                "4. Delete car (not implemented)\n" + // Delete
+                "Enter selection: ");
+    }
+
     // Calls correct function based on input selection
-    private static void handleMenuSelection(int selection){
-        switch (selection){
+    private static void handleMenuSelection(int selection) throws SQLException {
+        switch (selection) {
             case 1:
                 showCars();
                 break;
@@ -70,7 +80,7 @@ public class Main {
     }
 
     // Update an existing car in the database
-    public static void updateCar(){
+    public static void updateCar() {
         // 1. Ta emot uppgifter
         Scanner scanner = new Scanner(System.in);
 
@@ -96,11 +106,11 @@ public class Main {
         // 3. Skicka bilen till databasen
         db.updateCar(car);
 
-        // 4. Skriv ut om det funka!
+        // 4. Skriv ut om det fungerade!
     }
 
     // Create a new car and save to db
-    private static void addNewCar() {
+    private static void addNewCar() throws SQLException {
         Scanner scanner = new Scanner(System.in); // Scanner is used to retrieve user input
 
         // Tell our user to enter a make
@@ -115,43 +125,40 @@ public class Main {
         System.out.print("Enter year: ");
         int year = scanner.nextInt();
 
-        // Create new car from user inputs
         Car car = new Car(make, model, year);
 
         // Save car to db and save result (true/false) to variable
         boolean result = db.saveCar(car);
 
-        if(result){ // If result is true: Save successful
+        if (result) { // If result is true: Save successful
             System.out.println("Car saved");
-        }
-        else { // If not: Print error
+        } else { // If not: Print error
             System.out.println("Error saving car");
         }
     }
 
-    private static void showCars(){
-        ArrayList<Car> cars = db.getCars(); // Get all cars from db
+    private static void showCars() throws SQLException {
+        ArrayList<Car> cars = db.getAllCars(); // Get all cars from db
+        printCars(cars);
+    }
 
+    private static void printCars(ArrayList<Car> cars) {
         // Loop over all cars
         for (Car car : cars) {
             System.out.println(car); // Print each car
         }
     }
 
-    private static void newCar(){
-        var myVolvo = new Car("Volvo", "S90", 2023);
+    private static void showCarsNeedingService() throws SQLException {
+        ArrayList<Car> cars = db.getAllCars(); // Get all cars from db
 
-        System.out.println(myVolvo);
+        // Loop over all cars
+        for (Car car : cars) {
 
-        var db = new Database();
-
-        var res = db.saveCar(myVolvo);
-
-        if(res){
-            System.out.println("Car saved!");
+            if (car.needsService()) {
+                System.out.println(car); // Print each car
+            }
         }
-        else{
-            System.out.println("Car not saved");
-        }
+
     }
 }
